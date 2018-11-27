@@ -1,8 +1,11 @@
 var xvalues = []; 
 var yvalues = []; 
 
-var width = 3000;
-var height = 3000;
+// var width = 3000;
+// var height = 3000;
+// var stlButton;
+// var camera;
+// var controls;
 //boolean start;
 //PVector old_pos;
 
@@ -10,19 +13,45 @@ var controller = new Leap.Controller({enableGestures: true});
 
 controller.connect();
 
-// var nameblem = new THREE.Scene();
+var airPrint = new THREE.Scene();
+var cam = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+var Shape = new THREE.Object3D();
+var renderer = new THREE.WebGLRenderer({alpha: true});
+var exporter = new THREE.STLExporter();
 
 function setup(){
-  
+
+  // var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  noCanvas();
   // var c = document.getElementById("canvas")
-  createCanvas(1000, 1000, WEBGL);
+  // createCanvas(1000, 1000, WEBGL);
+  renderer.setSize(1000, 1000);
+  document.body.appendChild(renderer.domElement);
+
+  // stlButton = createButton("save as .STL");
+
+  // keyPressed(stl);
   // var ctx = c.getContext("3d");
   
   background(100);
   
 }
 
-function draw(){
+// controller.on("frame", function(frame){});
+
+function frame(){
+
+  shape();
+
+  airPrint.add(Shape);
+
+  animate();
+
+  // console.log("draw functional");
+
+}
+
+function shape(){
 
 //   stroke(0);
 //   noFill();
@@ -68,29 +97,48 @@ for(var f = 0; f < frame.fingers.length; f++){
         // var mid = width/2;
         // var distance = abs(touchy);
         
-        stroke(0);
-        strokeWeight(5);
+        // stroke(0);
+        // strokeWeight(5);
 
         // var color = (0);
       
         //draw a circle at finger position
         // lineTo(touchx, touchy);
-        ellipse(touchx, touchy, 2, 2);
+
+        var touch = new THREE.CircleGeometry(2);
+        var touchPoint = new THREE.Mesh(touch);
+        touchPoint.position.set(touchx, touchy, 0);
+
+        Shape.add(touchPoint);
+        // ellipse(touchx, touchy, 2, 2);
         
         //println(touchx);
         
         // translate(width/2, 0, 0);
-        box(width, 10, 10);
+
+        var horiz = new THREE.BoxGeometry(width - 100, 10, 10);
+        var hBox = new THREE.Mesh(horiz);
+        hBox.position.set(0, 0, 0);
+
+        Shape.add(hBox);
+        // box(width - 100, 10, 10);
         // translate(-width/2, 0, 0);
         
         if(touchx % 50 === 0){
                   
-          translate(touchx, 0, 0);
+          // translate(touchx, 0, 0);
           // stroke(255, 0, 0);
           // strokeWeight(2);
           // noFill();
-          box(20, touchy, touchy);
-          translate(-touchx, 0, 0);
+
+          var vert = new THREE.BoxGeometry(20, touchy, touchy);
+          var vBox = new THREE.Mesh(vert);
+          vBox.position.set(touchx, 0, 0);
+
+          Shape.add(vBox);
+
+          // box(20, touchy, touchy);
+          // translate(-touchx, 0, 0);
           
         }
       
@@ -103,6 +151,35 @@ for(var f = 0; f < frame.fingers.length; f++){
     
   }
   
+}
+
+function animate(){
+
+  requestAnimationFrame(animate);
+
+  shape();
+
+  // console.log(Shape);
+
+  airPrint.add(Shape);
+
+  // console.log(airPrint);
+
+  renderer.render(airPrint, cam);
+}
+
+function keyPressed(){
+
+  let exp = exporter.parse(airPrint);
+  let file = new Blob([exp], {type: 'model/stl'});
+  let link = document.createElement('a');
+
+  link.style.display = 'none';
+  document.body.appendChild(link);
+  link.href = URL.createObjectURL(file);
+  link.download = 'airPrint.stl';
+  link.click();
+
 }
 
 // controller.connect();
