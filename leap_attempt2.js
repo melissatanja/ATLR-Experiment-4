@@ -9,49 +9,75 @@ var yvalues = [];
 //boolean start;
 //PVector old_pos;
 
+var w = 1000;
+var h = 1000;
+
 var controller = new Leap.Controller({enableGestures: true});
 
 controller.connect();
+// console.log(controller);
 
-var airPrint = new THREE.Scene();
-var cam = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-var Shape = new THREE.Object3D();
-var renderer = new THREE.WebGLRenderer({alpha: true});
-var exporter = new THREE.STLExporter();
+// initScene = function(){
 
-function setup(){
+  let cam, airPrint, Shape, renderer, exporter;
 
-  // var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  noCanvas();
-  // var c = document.getElementById("canvas")
-  // createCanvas(1000, 1000, WEBGL);
-  renderer.setSize(1000, 1000);
+  airPrint = new THREE.Scene();
+  airPrint.background = new THREE.Color(0xffffff);
+  Shape = new THREE.Object3D();
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize(w, h);
+  // renderer.setClearColorHex(0xffffff, 1);
+  // renderer.domElement.className = "leap-drawing";
   document.body.appendChild(renderer.domElement);
+  // directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+  // directionalLight.position.set(0, 0.5, 1);
+  // airPrint.add(directionalLight);
 
-  // stlButton = createButton("save as .STL");
+  cam = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+  cam.lookAt(airPrint.position);
+  // airPrint.add(cam);
 
-  // keyPressed(stl);
-  // var ctx = c.getContext("3d");
+  exporter = new THREE.STLExporter();
+// }
+
+// function setup(){
+
+//   // var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+//   noCanvas();
+//   // var c = document.getElementById("canvas")
+//   // createCanvas(1000, 1000, WEBGL);
+//   // renderer.setSize(1000, 1000);
+//   // document.body.appendChild(renderer.domElement);
+
+//   // stlButton = createButton("save as .STL");
+
+//   // keyPressed(stl);
+//   // var ctx = c.getContext("3d");
   
-  background(100);
+//   background(100);
   
-}
+// }
 
 // controller.on("frame", function(frame){});
 
-function frame(){
+// function frame(){
 
-  shape();
+//   shape();
 
-  airPrint.add(Shape);
+//   airPrint.add(Shape);
 
-  animate();
+//   animate();
 
-  // console.log("draw functional");
+//   // console.log("draw functional");
 
-}
+// }
 
 function shape(){
+
+  var mid = new THREE.BoxGeometry(w - 100, 5, 5);
+  var midBox = new THREE.Mesh(mid);
+  Shape.add(midBox);
+  // scale(0.1, 0.1, 0.1);
 
 //   stroke(0);
 //   noFill();
@@ -78,6 +104,8 @@ for(var f = 0; f < frame.fingers.length; f++){
 
       if(finger.type == 1){
 
+        // finger.scale.set(0.5, 0.5, 1);
+
         // var interactionBox = frame.interactionBox;
         // var h = frame.interactionBox.height;
         // var w = frame.interactionBox.width;
@@ -89,8 +117,8 @@ for(var f = 0; f < frame.fingers.length; f++){
 
         // var finger_pos = leapToScene(finger.tipPosition());
         
-        var touchx = floor(finger.tipPosition[0]);
-        var touchy = floor(height/2 - finger.tipPosition[1]);
+        var touchx = Math.floor(finger.tipPosition[0]);
+        var touchy = Math.floor(h/2 - finger.tipPosition[1]);
 
         // console.log(touchy);
         
@@ -116,7 +144,7 @@ for(var f = 0; f < frame.fingers.length; f++){
         
         // translate(width/2, 0, 0);
 
-        var horiz = new THREE.BoxGeometry(width - 100, 10, 10);
+        var horiz = new THREE.BoxGeometry(w - 100, 10, 10);
         var hBox = new THREE.Mesh(horiz);
         hBox.position.set(0, 0, 0);
 
@@ -151,22 +179,30 @@ for(var f = 0; f < frame.fingers.length; f++){
     
   }
   
+  // airPrint.add(Shape);
+
 }
 
 function animate(){
 
   requestAnimationFrame(animate);
 
-  shape();
+    shape();
 
-  // console.log(Shape);
+    // Shape.scale = new THREE.Vector3(0.0000000000001, 0.0000000000001, 0.0000000000001);
+
+  console.log(Shape);
 
   airPrint.add(Shape);
 
-  // console.log(airPrint);
+  // airPrint.render();
+
+  console.log(airPrint);
 
   renderer.render(airPrint, cam);
 }
+
+animate();
 
 function keyPressed(){
 
