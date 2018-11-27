@@ -72,11 +72,28 @@ controller.connect();
 
 // }
 
+function leapPointToWorld(leapPoint, iBox){
+
+  var normalized = iBox.normailizePoint(leapPoint, false);
+  var z = normalized[2] * -1;
+  //recenter origin
+  var x = normalized[0] + 0.5;
+  z+= 0.5;
+  //scale
+  x*= 100;
+  var y = normalized[1] * 100;
+  z *= 100;
+
+  //this is the new origin, not sure if we need to put that in shape() somehow
+  return Leap.vec3.fromValues(x, y, z);
+
+}
+
 function shape(){
 
-  var mid = new THREE.BoxGeometry(w - 100, 5, 5);
-  var midBox = new THREE.Mesh(mid);
-  Shape.add(midBox);
+  // var mid = new THREE.BoxGeometry(w - 100, 5, 5);
+  // var midBox = new THREE.Mesh(mid);
+  // Shape.add(midBox);
   // scale(0.1, 0.1, 0.1);
 
 //   stroke(0);
@@ -118,7 +135,7 @@ for(var f = 0; f < frame.fingers.length; f++){
         // var finger_pos = leapToScene(finger.tipPosition());
         
         var touchx = Math.floor(finger.tipPosition[0]);
-        var touchy = Math.floor(h/2 - finger.tipPosition[1]);
+        var touchy = Math.floor(finger.tipPosition[1]);
 
         // console.log(touchy);
         
@@ -146,7 +163,7 @@ for(var f = 0; f < frame.fingers.length; f++){
 
         var horiz = new THREE.BoxGeometry(w - 100, 10, 10);
         var hBox = new THREE.Mesh(horiz);
-        hBox.position.set(0, 0, 0);
+        hBox.position.set(0, h/2, 0);
 
         Shape.add(hBox);
         // box(width - 100, 10, 10);
