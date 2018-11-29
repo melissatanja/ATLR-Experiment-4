@@ -74,8 +74,8 @@ controller.connect();
 
 function leapPointToWorld(leapPoint, iBox){
 
-  var normalized = iBox.normailizePoint(leapPoint, false);
-  var z = normalized[2] * -1;
+  var normalized = iBox.normalizePoint(leapPoint, false);
+  var z = normalized[2];
   //recenter origin
   var x = normalized[0] + 0.5;
   z+= 0.5;
