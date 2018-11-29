@@ -34,6 +34,7 @@ controller.connect();
   // airPrint.add(directionalLight);
 
   cam = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+  cam.position.z = 300;
   cam.lookAt(airPrint.position);
   // airPrint.add(cam);
 
@@ -91,6 +92,8 @@ function leapPointToWorld(leapPoint, iBox){
 
 function shape(){
 
+  var frame = controller.frame();
+
   // var mid = new THREE.BoxGeometry(w - 100, 5, 5);
   // var midBox = new THREE.Mesh(mid);
   // Shape.add(midBox);
@@ -111,8 +114,6 @@ function shape(){
   
 // controller.on("frame", function(frame){
 
-  var frame = controller.frame();
-
     // switch(finger.getType()){
       //0 is thumb, 1 is index, etc. 
       // case 1:
@@ -120,6 +121,10 @@ for(var f = 0; f < frame.fingers.length; f++){
     var finger = frame.fingers[f];
 
       if(finger.type == 1){
+    
+        var iBox = frame.interactionBox;
+
+        var finger_pos = leapPointToWorld(finger.tipPosition, iBox);
 
         // finger.scale.set(0.5, 0.5, 1);
 
@@ -134,8 +139,10 @@ for(var f = 0; f < frame.fingers.length; f++){
 
         // var finger_pos = leapToScene(finger.tipPosition());
         
-        var touchx = Math.floor(finger.tipPosition[0]);
-        var touchy = Math.floor(finger.tipPosition[1]);
+        var touchx = Math.floor(finger_pos[0]);
+        var touchy = Math.floor(finger_pos[1]);
+
+        // console.log(touchx);
 
         // console.log(touchy);
         
@@ -214,7 +221,7 @@ function animate(){
 
   // airPrint.render();
 
-  console.log(airPrint);
+  // console.log(airPrint);
 
   renderer.render(airPrint, cam);
 }
@@ -259,6 +266,6 @@ function keyPressed(){
 
 function mousePressed(){
   
-  saveCanvas("finger_painting", "jpg");
+  saveCanvas("air_printing", "jpg");
   
 }
