@@ -34,12 +34,20 @@ controller.connect();
   // airPrint.add(directionalLight);
 
   cam = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-  cam.position.z = 300;
+  cam.position.z = 400;
+  cam.position.x = 0;
   cam.lookAt(airPrint.position);
   // airPrint.add(cam);
 
   exporter = new THREE.STLExporter();
-// }
+
+  function keyPressed(stl){
+
+
+    
+  }
+
+  // }
 
 // function setup(){
 
@@ -228,7 +236,7 @@ function animate(){
 
 animate();
 
-function keyPressed(){
+function stl(){
 
   let exp = exporter.parse(airPrint);
   let file = new Blob([exp], {type: 'model/stl'});
