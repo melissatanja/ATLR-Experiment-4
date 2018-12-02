@@ -33,10 +33,10 @@ document.body.appendChild(renderer.domElement);
 //camera controls what we see on the screen, i.e. the viewport
 cam = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
 cam.position.z = 400;
-cam.lookAt(airPrint.position);
+// cam.lookAt(airPrint.position);
 
 // allows the leap to move the camera
-// controls = new THREE.LeapTrackballControls(cam, controller);
+controls = new THREE.LeapPointerControls(cam, controller);
 
 // controls.rotationSpeed = 10;
 // controls.rotationDampening = 0.98;
@@ -48,12 +48,12 @@ cam.lookAt(airPrint.position);
 // controls.minZoom = 200;
 // controls.maxZoom = 800;
 
-controls = new THREE.OrbitControls(cam);
+// controls = new THREE.OrbitControls(cam);
 
-controls.minAzimuthAngle = -Math.PI/2;
-controls.maxAzimuthAngle = Math.PI/2;
-controls.minPolarAngle = Math.PI/2;
-controls.maxPolarAngle = Math.PI/2;
+// controls.minAzimuthAngle = -Math.PI/2;
+// controls.maxAzimuthAngle = Math.PI/2;
+// controls.minPolarAngle = Math.PI/2;
+// controls.maxPolarAngle = Math.PI/2;
 
 //allows us to export a printable file
 exporter = new THREE.STLExporter();
@@ -80,22 +80,51 @@ function leapPointToWorld(leapPoint, iBox){
 
 }
 
+// function handControl(){
+
+// 	for(var h = 0; h < frame.hands.length; h++){
+//     	var hand = frame.hands[h];
+
+//     	if(hand.type == "left"){
+
+//     		var iBox = frame.interactionBox;
+// 		    var hand_pos = leapPointToWorld(hand.palmPosition, iBox);
+// 		    var hand_dir = new THREE.Vector3().fromArray(hand.palmNormal);
+
+// 		    hand.sphereCenter = [0, 0, 0];
+
+// 		    cam.position = hand_pos;
+
+//     	}
+// 	}
+
+
+// }
+
 function shape(){
 
 	//frame is like draw, creates a loop to keep getting input from the Leap
 	var frame = controller.frame();
 
-	for(var f = 0; f < frame.fingers.length; f++){
+	for(var h = 0; h < frame.hands.length; h++){
+    	
+    	// var hand = frame.hands[h];
+
+    	if(frame.hands[h].type == "right"){
+
+    		var hand = frame.hands[h];
+
+	// for(var f = 0; f < frame.fingers.length; f++){
     
-		var finger = frame.fingers[f];
+	// 	var finger = frame.fingers[f];
 
 	    //0 is thumb, 1 is index, etc. 
 	    //this should only let you draw with your index
-	    if(finger.type == 1){
+	    // if(finger.type == 1){
 	    
 	    	//variables from mapping function
 		    var iBox = frame.interactionBox;
-		    var finger_pos = leapPointToWorld(finger.tipPosition, iBox);
+		    var finger_pos = leapPointToWorld(hand.indexFinger.tipPosition, iBox);
 
 		    //constraining finger position
 		    var finger_posX = Math.min(hBoxW/2 - 15, Math.max(- (hBoxW/2 - 15), finger_pos[0]));
@@ -200,8 +229,7 @@ function shape(){
 	    	}
 
     	}
-    
-  	}
+    }
 
 }
 
