@@ -15,7 +15,7 @@ var controller = new Leap.Controller({enableGestures: true});
 controller.connect();
 
 //variables for scene setup
-let cam, airPrint, Shape, renderer, exporter, boxPos;
+let cam, airPrint, Shape, renderer, exporter, boxPos, controls;
 
 //scene (what gets rendered)
 airPrint = new THREE.Scene();
@@ -34,6 +34,26 @@ document.body.appendChild(renderer.domElement);
 cam = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
 cam.position.z = 400;
 cam.lookAt(airPrint.position);
+
+// allows the leap to move the camera
+// controls = new THREE.LeapTrackballControls(cam, controller);
+
+// controls.rotationSpeed = 10;
+// controls.rotationDampening = 0.98;
+
+// controls.zoomEnabled = true;
+// controls.zoom = 400;
+// controls.zoomDampening = 0.6;
+// controls.zoomCutoff = 0.9;
+// controls.minZoom = 200;
+// controls.maxZoom = 800;
+
+controls = new THREE.OrbitControls(cam);
+
+controls.minAzimuthAngle = -Math.PI/2;
+controls.maxAzimuthAngle = Math.PI/2;
+controls.minPolarAngle = Math.PI/2;
+controls.maxPolarAngle = Math.PI/2;
 
 //allows us to export a printable file
 exporter = new THREE.STLExporter();
@@ -162,7 +182,7 @@ function shape(){
 		      	// if(touchx != ){
 
 		      	//vertical boxes
-		        var vert = new THREE.BoxGeometry(15, touchy * 1.5, touchy * 1.5);
+		        var vert = new THREE.BoxGeometry(15, touchy, touchy);
 		        var vBox = new THREE.Mesh(vert);
 		        vBox.position.set(touchx, 0, 0);
 
@@ -172,7 +192,7 @@ function shape(){
 
 		        Shape.add(boxPos);
 
-		        console.log(boxes);
+		        // console.log(boxes);
 
 		      	// }
 				// }
@@ -194,6 +214,7 @@ function animate(){
 
   airPrint.add(Shape);
 
+  controls.update();
   renderer.render(airPrint, cam);
 
 }
