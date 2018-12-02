@@ -1,6 +1,3 @@
-// var xvalues = []; 
-// var yvalues = []; 
-
 var boxes = [];
 
 //width and height for the renderer
@@ -38,23 +35,6 @@ cam.position.z = 400;
 // allows the leap to move the camera
 controls = new THREE.LeapPointerControls(cam, controller);
 
-// controls.rotationSpeed = 10;
-// controls.rotationDampening = 0.98;
-
-// controls.zoomEnabled = true;
-// controls.zoom = 400;
-// controls.zoomDampening = 0.6;
-// controls.zoomCutoff = 0.9;
-// controls.minZoom = 200;
-// controls.maxZoom = 800;
-
-// controls = new THREE.OrbitControls(cam);
-
-// controls.minAzimuthAngle = -Math.PI/2;
-// controls.maxAzimuthAngle = Math.PI/2;
-// controls.minPolarAngle = Math.PI/2;
-// controls.maxPolarAngle = Math.PI/2;
-
 //allows us to export a printable file
 exporter = new THREE.STLExporter();
 
@@ -80,27 +60,6 @@ function leapPointToWorld(leapPoint, iBox){
 
 }
 
-// function handControl(){
-
-// 	for(var h = 0; h < frame.hands.length; h++){
-//     	var hand = frame.hands[h];
-
-//     	if(hand.type == "left"){
-
-//     		var iBox = frame.interactionBox;
-// 		    var hand_pos = leapPointToWorld(hand.palmPosition, iBox);
-// 		    var hand_dir = new THREE.Vector3().fromArray(hand.palmNormal);
-
-// 		    hand.sphereCenter = [0, 0, 0];
-
-// 		    cam.position = hand_pos;
-
-//     	}
-// 	}
-
-
-// }
-
 function shape(){
 
 	//frame is like draw, creates a loop to keep getting input from the Leap
@@ -112,19 +71,11 @@ function shape(){
 
     	if(frame.hands[h].type == "right"){
 
-    		var hand = frame.hands[h];
-
-	// for(var f = 0; f < frame.fingers.length; f++){
-    
-	// 	var finger = frame.fingers[f];
-
-	    //0 is thumb, 1 is index, etc. 
-	    //this should only let you draw with your index
-	    // if(finger.type == 1){
+    		var rightHand = frame.hands[h];
 	    
 	    	//variables from mapping function
 		    var iBox = frame.interactionBox;
-		    var finger_pos = leapPointToWorld(hand.indexFinger.tipPosition, iBox);
+		    var finger_pos = leapPointToWorld(rightHand.indexFinger.tipPosition, iBox);
 
 		    //constraining finger position
 		    var finger_posX = Math.min(hBoxW/2 - 15, Math.max(- (hBoxW/2 - 15), finger_pos[0]));
@@ -132,9 +83,6 @@ function shape(){
 
 		    var touchx = Math.round(finger_posX);
 		    var touchy = Math.round(finger_posY);
-
-		    // console.log(touchx);
-		    // console.log(touchy);
 
 		    //circles at finger position --> line 
 		    var touch = new THREE.CircleGeometry(2);
@@ -183,9 +131,6 @@ function shape(){
 
 		    Shape.add(loop);
 
-			//check if the box is equal width from other boxes
-			if(touchx % 25 === 0){
-
 				//go through array of box x positions
 				// for(b of boxPos.children){
 
@@ -210,8 +155,13 @@ function shape(){
 
 		      	// if(touchx != ){
 
-		      	//vertical boxes
-		        var vert = new THREE.BoxGeometry(15, touchy, touchy);
+			//check if the box is equal width from other boxes
+			if(touchx % 25 === 0){
+
+				if(touchx % 50 === 0){
+
+		      	//constant height
+		        var vert = new THREE.BoxGeometry(15, 80, touchy);
 		        var vBox = new THREE.Mesh(vert);
 		        vBox.position.set(touchx, 0, 0);
 
@@ -221,6 +171,21 @@ function shape(){
 
 		        Shape.add(boxPos);
 
+		    } else{
+
+		    	//constant depth
+		        var vert = new THREE.BoxGeometry(15, touchy, 80);
+		        var vBox = new THREE.Mesh(vert);
+		        vBox.position.set(touchx, 0, 0);
+
+		        boxes.push(vBox.position.x);
+
+		        boxPos.add(vBox);
+
+		        Shape.add(boxPos);
+
+		    }
+
 		        // console.log(boxes);
 
 		      	// }
@@ -229,7 +194,43 @@ function shape(){
 	    	}
 
     	}
+
+    	if(frame.hands[h].type == "left"){
+
+    		leftHand = frame.hands[h];
+
+    		// console.log(leftHand.palmPosition[0]);
+
+	    	if(leftHand.palmPosition[1] > 750 && leftHand.palmPosition[0] < -550){
+
+	    		saveSTL();
+
+	    	} else if(leftHand.grabStrength == 1){
+
+    			location.reload();
+
+    		}
+
+    	}
     }
+
+}
+
+function saveSTL(){
+
+	cam.position.set(0, 0, 400);
+
+	renderer.render(airPrint, cam);
+
+	let exp = exporter.parse(airPrint);
+    let file = new Blob([exp], {type: 'model/stl'});
+    let link = document.createElement('a');
+
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.href = URL.createObjectURL(file);
+    link.download = 'airPrint.stl';
+    link.click();
 
 }
 
@@ -250,20 +251,20 @@ function animate(){
 animate();
 
 //keypress function to save STL file
-document.onkeydown = function(){ 
+// document.onkeydown = function saveSTL(){ 
 
-  if (event.which == 13){   
+//   if (event.which == 13){   
 
-    let exp = exporter.parse(airPrint);
-    let file = new Blob([exp], {type: 'model/stl'});
-    let link = document.createElement('a');
+//     let exp = exporter.parse(airPrint);
+//     let file = new Blob([exp], {type: 'model/stl'});
+//     let link = document.createElement('a');
 
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.href = URL.createObjectURL(file);
-    link.download = 'airPrint.stl';
-    link.click();
+//     link.style.display = 'none';
+//     document.body.appendChild(link);
+//     link.href = URL.createObjectURL(file);
+//     link.download = 'airPrint.stl';
+//     link.click();
 
-  } 
+//   } 
  
-}
+// }
