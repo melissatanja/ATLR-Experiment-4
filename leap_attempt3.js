@@ -158,10 +158,9 @@ function shape(){
 			//check if the box is equal width from other boxes
 			if(touchx % 25 === 0){
 
-				if(touchx % 50 === 0){
+				// if(touchx % 50 === 0){
 
-		      	//constant height
-		        var vert = new THREE.BoxGeometry(15, 80, touchy);
+		        var vert = new THREE.BoxGeometry(15, touchy * 0.75, touchy * 0.75);
 		        var vBox = new THREE.Mesh(vert);
 		        vBox.position.set(touchx, 0, 0);
 
@@ -170,26 +169,6 @@ function shape(){
 		        boxPos.add(vBox);
 
 		        Shape.add(boxPos);
-
-		    } else{
-
-		    	//constant depth
-		        var vert = new THREE.BoxGeometry(15, touchy, 80);
-		        var vBox = new THREE.Mesh(vert);
-		        vBox.position.set(touchx, 0, 0);
-
-		        boxes.push(vBox.position.x);
-
-		        boxPos.add(vBox);
-
-		        Shape.add(boxPos);
-
-		    }
-
-		        // console.log(boxes);
-
-		      	// }
-				// }
 	      
 	    	}
 
@@ -199,26 +178,43 @@ function shape(){
 
     		leftHand = frame.hands[h];
 
-    		// console.log(leftHand.palmPosition[0]);
+    		var previousFrame = controller.frame(1);
+			var movement = leftHand.translation(previousFrame);
 
-	    	if(leftHand.palmPosition[1] > 750 && leftHand.palmPosition[0] < -550){
+			let saves = 0;
+
+	    	if(leftHand.palmPosition[1] > 700 && movement > 200){
+
+	    		saves += 1;
 
 	    		saveSTL();
 
-	    	} else if(leftHand.grabStrength == 1){
+	    	}
+
+	    	// var prevGrab = leftHand.grabStrength(previousFrame);
+	    	// console.log(prevGrab);
+
+	    	var prevHand = controller.frame(1).hand(leftHand.id);
+
+	    	var prevGrab = prevHand.grabStrength;
+
+	    	var grab = leftHand.grabStrength - prevGrab;
+
+	    	if(grab > 0.5){
 
     			location.reload();
 
     		}
 
     	}
+
     }
 
 }
 
-function saveSTL(){
+function saveSTL(saves, ){
 
-	cam.position.set(0, 0, 400);
+	// cam.position.set(0, 0, 400);
 
 	renderer.render(airPrint, cam);
 
@@ -229,8 +225,30 @@ function saveSTL(){
     link.style.display = 'none';
     document.body.appendChild(link);
     link.href = URL.createObjectURL(file);
-    link.download = 'airPrint.stl';
+    link.download =  'airPrint.stl';
     link.click();
+
+}
+
+function saveJPG(){
+
+	cam.position.set(0, 0, 400);
+
+	renderer.render(airPrint, cam);
+
+	let exp = exporter.parse(airPrint);
+    let file = new Blob([exp], {type: 'image/png'});
+    let link = document.createElement('a');
+
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.href = URL.createObjectURL(file);
+
+    link.download = 'airPrint.png';
+
+    link.click();
+
+    location.reload();
 
 }
 
