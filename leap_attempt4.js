@@ -1,6 +1,11 @@
+var boxes = [];
+
 //width and height for the renderer
 var w = 900;
 var h = 900;
+
+//right hand grab 
+var rightGrab = false; 
 
 //width for the horizontal box
 var hBoxW = 400;
@@ -129,6 +134,30 @@ function shape(){
 
 		    Shape.add(loop);
 
+				//go through array of box x positions
+				// for(b of boxPos.children){
+
+				//check if current finger x position is equal to any of the previous box x positions
+				//if not, draw a box at the current finger x position
+					
+				// if(boxPos.length == 0){
+
+			    //      var vert = new THREE.BoxGeometry(20, touchy, touchy);
+			    //      var vBox = new THREE.Mesh(vert);
+			    //      vBox.position.set(touchx, 0, 0);
+
+			    //      // boxPos.push(vBox.position.x);
+			    //      append(boxPos, vBox.position.x);
+			    //      console.log(boxPos);
+
+			    //      Shape.add(vBox);
+
+			    //      // box(20, touchy, touchy);
+			    //      // translate(-touchx, 0, 0);
+			    //  	}
+
+		      	// if(touchx != ){
+
 			//check if the box is equal width from other boxes
 			if(touchx % 25 === 0){
 
@@ -138,43 +167,79 @@ function shape(){
 		        var vBox = new THREE.Mesh(vert);
 		        vBox.position.set(touchx, 0, 0);
 
+		        boxes.push(vBox.position.x);
+
 		        boxPos.add(vBox);
 
 		        Shape.add(boxPos);
 	      
 	    	}
 
+	    	// var prevHand = controller.frame(1).hand(rightHand.id);
+
+	    	// var prevGrab = prevHand.grabStrength;
+
+	    	// var grab = rightHand.grabStrength - prevGrab;
+
+	    	var rGrab = rightHand.grabStrength;
+
+	    	if(rGrab == 1){
+
+	    		rightGrab = true;
+
+	    	} else{
+
+	    		rightGrab = false;
+
+	    	}
+
+	    	// if(lGrab == 1){
+
+    		// 	rGrab = 1; 
+
+    		// } else { 
+    		// 	rGrab = 0;
+    		// }
+
+    		// console.log(rightGrab); // this works
+
     	}
 
     	if(frame.hands[h].type == "left"){
 
     		leftHand = frame.hands[h];
+    		//rightHand = frame.hands[h]; //lol wtf
 
     		var previousFrame = controller.frame(1);
 			var movement = leftHand.translation(previousFrame);
 
-			let saves = 0;
-
 	    	if(leftHand.palmPosition[1] > 700 && movement > 200){
 
 	    		saves += 1;
-
-	    		saveSTL();
-
+				window.setTimeout(saveSTL(), 5000); // milliseconds
 	    	}
 
 	    	// var prevGrab = leftHand.grabStrength(previousFrame);
 	    	// console.log(prevGrab);
 
-	    	var prevHand = controller.frame(1).hand(leftHand.id);
+	    	// var prevHand = controller.frame(1).hand(leftHand.id);
 
-	    	var prevGrab = prevHand.grabStrength;
+	    	// var prevGrab = prevHand.grabStrength;
 
-	    	var grab = leftHand.grabStrength - prevGrab;
+	    	// var grab = leftHand.grabStrength - prevGrab;
 
-	    	if(grab > 0.5){
+	    	var lGrab = leftHand.grabStrength;
 
-    			location.reload();
+	    	// console.log(lGrab); 
+
+	    	if(rightGrab == true){
+
+	    		if(lGrab == 1){
+
+    				window.setTimeout(location.reload(), 3000); // 3 secs
+    				;
+
+    			}
 
     		}
 
@@ -184,7 +249,7 @@ function shape(){
 
 }
 
-function saveSTL(){
+function saveSTL(saves, ){
 
 	// cam.position.set(0, 0, 400);
 
@@ -199,6 +264,28 @@ function saveSTL(){
     link.href = URL.createObjectURL(file);
     link.download =  'airPrint.stl';
     link.click();
+
+}
+
+function saveJPG(){
+
+	cam.position.set(0, 0, 400);
+
+	renderer.render(airPrint, cam);
+
+	let exp = exporter.parse(airPrint);
+    let file = new Blob([exp], {type: 'image/png'});
+    let link = document.createElement('a');
+
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.href = URL.createObjectURL(file);
+
+    link.download = 'airPrint.png';
+
+    link.click();
+
+    location.reload();
 
 }
 
