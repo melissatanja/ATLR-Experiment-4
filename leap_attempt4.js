@@ -164,6 +164,8 @@ function shape(){
 
     				window.setTimeout(save(), 3000);
 
+    				console.log("save");
+
     			}
 
     		}
