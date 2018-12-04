@@ -5,6 +5,8 @@ var h = 900;
 //width for the horizontal box
 var hBoxW = 400;
 
+var saved = false;
+
 var controller = new Leap.Controller({frameEventName: 'animationFrame'});
 
 controller.connect();
@@ -147,12 +149,16 @@ function shape(){
 
 			var palm = leftHand.palmNormal;
 
+			var direction = leftHand.direction;
+
 	    	if(rightGrab == true){
 
 	    		if(lGrab == 1){
 
     				window.setTimeout(location.reload(), 3000); // 3 secs
     				;
+
+    				saved = false;
 
     			}
 
@@ -162,7 +168,9 @@ function shape(){
 
     			if(rightDown === true){
 
-    				window.setTimeout(save(), 3000);
+    				// window.setTimeout(save(), 3000);
+
+    				saveSTLFile();
 
     				console.log("save");
 
@@ -175,32 +183,38 @@ function shape(){
 	}
 }
 
-function save(){
+function saveSTLFile(){
 
-	cam.position.set(0, 0, 400);
+	if(!saved){
 
-	renderer.render(airPrint, cam);
-	let exp = exporter.parse(airPrint);
+		cam.position.set(0, 0, 400);
 
-	//save STL
-    let stlFile = new Blob([exp], {type: 'model/stl'});
-    let stlLink = document.createElement('a');
+		renderer.render(airPrint, cam);
+		let exp = exporter.parse(airPrint);
 
-    stlLink.style.display = 'none';
-    document.body.appendChild(stlLink);
-    stlLink.href = URL.createObjectURL(stlFile);
-    stlLink.download =  'airPrint.stl';
-    stlLink.click();
+		//save STL
+	    let stlFile = new Blob([exp], {type: 'model/stl'});
+	    let stlLink = document.createElement('a');
 
-    //save JPG
-    let jpgFile = new Blob([exp], {type: 'image/jpeg'});
-    let jpgLink = document.createElement('a');
+	    stlLink.style.display = 'none';
+	    document.body.appendChild(stlLink);
+	    stlLink.href = URL.createObjectURL(stlFile);
+	    stlLink.download =  'airPrint.stl';
+	    stlLink.click();
 
-    jpgLink.style.display = 'none';
-    document.body.appendChild(jpgLink);
-    jpgLink.href = URL.createObjectURL(jpgFile);
-    jpgLink.download =  'airPrint.jpg';
-    jpgLink.click();
+	    //save JPG
+	    let jpgFile = new Blob([exp], {type: 'image/jpeg'});
+	    let jpgLink = document.createElement('a');
+
+	    jpgLink.style.display = 'none';
+	    document.body.appendChild(jpgLink);
+	    jpgLink.href = URL.createObjectURL(jpgFile);
+	    jpgLink.download =  'airPrint.jpg';
+	    jpgLink.click();
+
+	    saved = true;
+
+	}
 
 }
 
